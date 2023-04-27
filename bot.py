@@ -36,7 +36,7 @@ def greet_user(bot, update, user_data):
 
 
 
-# user send text
+# send text user 
 def talk_to_me(bot, update, user_data):
 	# user_text = update.message.text
 	user_text = 'User {}*{} sended: "{}"'.\
@@ -80,6 +80,7 @@ def get_location(bot, update, user_data):
 	update.message.reply_text('Ready! {}'.format(get_user_emo(user_data)), reply_markup=get_keyboard())
 
 
+# keyboard
 def get_keyboard():
 	contact_button = KeyboardButton('Send contacts', request_contact=True)
 	location_button = KeyboardButton('Send coordinates', request_location=True)
