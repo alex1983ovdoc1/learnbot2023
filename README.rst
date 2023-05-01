@@ -29,7 +29,7 @@ create file setting.py with your bot's api_kay
 Starting:
 --------
 
-In activate virtual starting firl bot.py:
+In activate virtual starting file bot.py:
 
 .. code-block:: text
 
