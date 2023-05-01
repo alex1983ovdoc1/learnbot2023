@@ -29,8 +29,8 @@ create file setting.py with your bot's api_kay
 Starting:
 --------
 
-In activate virtual:
+In activate virtual starting firl bot.py:
 
 .. code-block:: text
-	
+
 	python bot.py
