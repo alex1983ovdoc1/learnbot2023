@@ -22,14 +22,13 @@ def greet_user(bot, update, user_data):
 # send text user 
 def talk_to_me(bot, update, user_data):
 	user_text = update.message.text
-	# print(user_text)
-	# print(type(user_text))
-	# print(user_text[:5])
+
 	if user_text[:5] == 'calc:':
 		string_r = user_text[5:]
 		result_r = a9_calculator.calculator(string_r)
 		print(result_r)
 		bot.send_message(chat_id=update.message.chat.id, text = f'Your result: {result_r}', reply_markup = get_keyboard())		
+	
 	else:
 		user_text = 'User {}*{} sended: "{}"'.\
 		format(update.message.chat.first_name, user_data['emo'], update.message.text)
@@ -76,9 +75,7 @@ def start_calculater(bot, update, user_data):
 	calc_text = ('Plese enter (calc: 2 + 2 * 6....): ')
 	print(calc_text)
 	update.message.reply_text(calc_text, reply_markup=get_keyboard())
-	# print(type(update.message.text))
-	# if update.message.text[:5] == '/calc':
-	# 	print('__+++')
+
 
 # Strart bot
 def start_bot(bot, update, user_data):
