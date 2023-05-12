@@ -2,3 +2,9 @@
 env/
 settings0.py
 __pycache__/
+command_work_in_git_4_5
+.vs/
+temp/
+mf.py
+pip_test.py
+t.txt

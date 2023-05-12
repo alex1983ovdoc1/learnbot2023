@@ -2,6 +2,9 @@ from glob import glob
 import logging
 from random import choice
 
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
+from telegram.ext import ConversationHandler
+
 from utils_bot import get_keyboard, get_user_emo
 import a9_calculator
 
@@ -84,6 +87,56 @@ def start_bot(bot, update, user_data):
 	# print()
 
 
+# Start form
+def anketa_start(bot, update, user_data):
+	update.message.reply_text("What's your name? Please write your first_name and last_name", reply_markup=ReplyKeyboardRemove())
+	return "name"
 
 
+# first step form
+def anketa_get_name(bot, update, user_data):
+	user_name = update.message.text
+	if len(user_name.split(" ")) != 2:
+		update.message.reply_text("Please enter your first and last name:")
+		return "name"
+	else:
+		user_data['anketa_name'] = user_name
+		reply_keyboard = [["1", "2", "3", "4", "5"]]
+
+		update.message.reply_text(
+			"Rate our BOT from 1 to 5:",
+			reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True, resize_keyboard=True)
+			)
+		return "rating"
+
+# next step form
+def anketa_rating(bot, update, user_data):
+	user_data['anketa_rating'] = update.message.text
+	update.message.reply_text("""Please write a review\
+		or /skip for go next step""")
+	return "comment"
+
+# print comment
+def anketa_comment(bot, update, user_data):
+	user_data['anketa_comment'] = update.message.text
+	text = """
+	<b>Last name, Name:</b> {anketa_name}
+	<b>Rating:</b> {anketa_rating}
+	<b>Comment:</b> {anketa_comment}""".format(**user_data)
+	update.message.reply_text(text, reply_markup=get_keyboard(), parse_mode=ParseMode.HTML)
+	return ConversationHandler.END
+
+# skip comment
+def anketa_skip_comment(bot, update, user_data):
+	user_data['anketa_comment'] = update.message.text
+	text = """
+	<b>Last name, Name:</b> {anketa_name}
+	<b>Rating:</b> {anketa_rating}""".format(**user_data)
+	update.message.reply_text(text, reply_markup=get_keyboard(), parse_mode=ParseMode.HTML)
+	return ConversationHandler.END
+
+# print don't know if rating != int()
+def dontknow(bot, update, user_data):
+	update.message.reply_text("Sorry, I don't undestandin you...", reply_markup=get_keyboard())
+	return ConversationHandler.END
 
