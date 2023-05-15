@@ -26,7 +26,7 @@ def get_keyboard():
 		['', '-start bot-', ''],
 		['Send a cat', 'Change avatar'],
 		[contact_button, location_button, 'calculator'],
-		['Fill in the form']
+		['Fill in the form', 'Subscribe', 'Unsubscribe', 'Setalarm']
 		], resize_keyboard=True
 		)
 	return my_keyboard

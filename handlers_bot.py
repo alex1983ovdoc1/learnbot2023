@@ -4,12 +4,16 @@ from random import choice
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
 from telegram.ext import ConversationHandler
+from telegram.ext import messagequeue as mq
 
 from utils_bot import get_keyboard, get_user_emo
 import a9_calculator
+from bot import subscribers
+
 
 # command /start1	
 def greet_user(bot, update, user_data):	
+	print(update.message.chat_id)
 	emo = get_user_emo(user_data)
 	# emo = emojize(choice(settings0.USER_EMOJI))	
 	user_data['emo'] = emo
@@ -19,7 +23,6 @@ def greet_user(bot, update, user_data):
 	update.message.reply_text(text, reply_markup=get_keyboard())
 	text0 = 'User /{}/: "{}"'.format(update.message.chat.first_name, text)
 	logging.info(text0)
-
 
 
 # send text user 
@@ -73,6 +76,7 @@ def get_location(bot, update, user_data):
 	print(update.message.location)
 	update.message.reply_text('Ready! {}'.format(get_user_emo(user_data)), reply_markup=get_keyboard())
 
+
 # start calculator
 def start_calculater(bot, update, user_data):
 	calc_text = ('Plese enter (calc: 2 + 2 * 6....): ')
@@ -109,12 +113,14 @@ def anketa_get_name(bot, update, user_data):
 			)
 		return "rating"
 
+
 # next step form
 def anketa_rating(bot, update, user_data):
 	user_data['anketa_rating'] = update.message.text
 	update.message.reply_text("""Please write a review\
 		or /skip for go next step""")
 	return "comment"
+
 
 # print comment
 def anketa_comment(bot, update, user_data):
@@ -126,6 +132,7 @@ def anketa_comment(bot, update, user_data):
 	update.message.reply_text(text, reply_markup=get_keyboard(), parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
 
+
 # skip comment
 def anketa_skip_comment(bot, update, user_data):
 	user_data['anketa_comment'] = update.message.text
@@ -135,8 +142,54 @@ def anketa_skip_comment(bot, update, user_data):
 	update.message.reply_text(text, reply_markup=get_keyboard(), parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
 
+
 # print don't know if rating != int()
 def dontknow(bot, update, user_data):
 	update.message.reply_text("Sorry, I don't undestandin you...", reply_markup=get_keyboard())
 	return ConversationHandler.END
 
+
+# subscribe
+def subscribe(bot, update, user_data):
+	subscribers.add(update.message.chat_id)
+	update.message.reply_text('You subscribed!!!')
+	print('subscriber')
+
+
+# send messages users
+@mq.queuedmessage
+def send_updates(bot, job):
+	for chat_id in subscribers:
+		bot.sendMessage(chat_id=chat_id, text='Busyyy')
+
+
+# unsubscribe
+def unsubscribe(bot, update, user_data):
+	if update.message.chat_id in subscribers:
+		subscribers.remove(update.message.chat_id)
+		update.message.reply_text('You unsubscribed!!!')
+		print('Unsubscriber')
+	else:
+		update.message.reply_text("You don't subscribed, please tach /subscribe")
+
+
+# users alarm button Setalarm
+def set_alarm1(bot, update, user_data):
+	update.message.reply_text("Enter number time after comand /alarm")
+
+
+# users alarm
+def set_alarm(bot, update, user_data, args, job_queue):
+	# update.message.reply_text("/alarm")
+	# print('/alarm')
+	try:
+		seconds = abs(int(args[0]))
+		job_queue.run_once(alarm, seconds, context=update.message.chat_id)
+	except (IndexError, ValueError):
+		update.message.reply_text("Enter number time after comand /alarm")
+
+
+# send messages alarm
+@mq.queuedmessage
+def alarm(bot, job):
+	bot.sendMessage(chat_id=job.context, text='Start ALARM!')
