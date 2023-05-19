@@ -1,7 +1,7 @@
 
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, RegexHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ConversationHandler, RegexHandler
 from telegram.ext import messagequeue as mq
 
 from handlers_bot import *
@@ -74,6 +74,8 @@ def main():
 	dp.add_handler(RegexHandler('^(-start bot-)$', start_bot, pass_user_data=True))
 	dp.add_handler(RegexHandler('^(Send a cat)$', send_cat_picture, pass_user_data=True))
 	dp.add_handler(RegexHandler('^(Change avatar)$', change_avatar, pass_user_data=True))
+	# dp.add_handler(RegexHandler('^(Show inline-keyboard)$', show_inlinek, pass_user_data=True))
+	dp.add_handler(CallbackQueryHandler(inline_button_pressed))
 	dp.add_handler(RegexHandler('^(calculator)$', start_calculater, pass_user_data=True))
 	dp.add_handler(MessageHandler(Filters.contact, get_contact, pass_user_data=True))
 	dp.add_handler(MessageHandler(Filters.location, get_location, pass_user_data=True))

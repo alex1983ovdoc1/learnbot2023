@@ -2,7 +2,8 @@ from glob import glob
 import logging
 from random import choice
 
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode, error
+from emoji import emojize
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, error
 from telegram.ext import ConversationHandler
 from telegram.ext import messagequeue as mq
 
@@ -56,9 +57,20 @@ def send_cat_picture(bot, update, user_data):
 	user = get_or_create_user(db, update.effective_user, update.message)
 	cat_list = glob('images/cat*.jp*g')
 	cat_pic = choice(cat_list)
+	inlinekeyboard = [[InlineKeyboardButton(emojize(':thumbs_up:'), callback_data='cat_good'),
+		InlineKeyboardButton(emojize(':thumbs_down:'), callback_data='cat_bad')]]
+	kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
 	print(cat_pic)
 	bot.send_photo(chat_id=user['chat_id'],
-	 photo=open(cat_pic, 'rb'), reply_markup=get_keyboard())
+	 photo=open(cat_pic, 'rb'), reply_markup=kbd_markup)
+
+# # show_inline keyboard
+# def show_inlinek(bot, update, user_data):
+# 	inlinekeyboard = [[InlineKeyboardButton('Funny', callback_data='1'),
+# 		InlineKeyboardButton('Not funny', callback_data='0')]]
+# 	kbd_markup = InlineKeyboardMarkup(inlinekeyboard)
+# 	update.message.reply_text("It's easy or not easy???",
+# 		reply_markup=kbd_markup)
 
 
 # change avatar
@@ -211,3 +223,23 @@ def set_alarm(bot, update, user_data, args, job_queue):
 @mq.queuedmessage
 def alarm(bot, job):
 	bot.sendMessage(chat_id=job.context, text='Start ALARM!', reply_markup=get_keyboard())
+
+
+# procces pressed inline keyboard button (for send_cat)
+def inline_button_pressed(bot, update):
+	# print(update.callback_query)
+	query = update.callback_query
+	if query.data in ['cat_good', 'cat_bad']:
+		text = "Nice!" if query.data=='cat_good' else 'Not nice.'
+	bot.edit_message_caption(caption=text, chat_id=query.message.chat.id, message_id=query.message.message_id)
+
+# # procces pressed inline keyboard button ('1' or '0')
+# def inline_button_pressed(bot, update):
+# 	# print(update.callback_query)
+# 	query = update.callback_query
+# 	try: 
+# 		user_choice = int(query.data)
+# 		text = ":-)" if user_choice>0 else ':-('
+# 	except TypeError:
+# 		text = "Something went wrong..."
+# 	bot.edit_message_text(text=text, chat_id=query.message.chat.id, message_id=query.message.message_id)
